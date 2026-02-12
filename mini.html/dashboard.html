@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Admin Dashboard – Smart RFID</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="../style.css/dashboard.css">
+
+</head>
+
+<body>
+
+<!-- ADMIN ACCESS CHECK -->
+<script>
+  const userRole = "admin";
+  if (userRole !== "admin") {
+    alert("Access Denied: Admin Only");
+    window.location.href = "login.html";
+  }
+</script>
+
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1>📊 Admin Dashboard</h1>
+    <div class="header-right">
+      <button class="themeToggle" onclick="toggleTheme()" id="themeBtn">🌙</button>
+      <div class="role">👤 Role: <span>Administrator</span></div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="cards">
+    <div class="card"><h2>120</h2><p>Total Registered User</p></div>
+    <div class="card"><h2>95</h2><p>Attendance Marked Today</p></div>
+    <div class="card"><h2>25</h2><p>Absent User</p></div>
+    <div class="card"><h2>3</h2><p>System Alerts</p></div>
+  </div>
+
+  <!-- CHARTS -->
+  <div class="chartsContainer">
+    <div class="section">
+      <h3>📈 Attendance Analytics</h3>
+      <div class="chartBox">
+        <canvas id="attendanceChart"></canvas>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>📊 Weekly Attendance Trend</h3>
+      <div class="chartBox">
+        <canvas id="weeklyChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="section">
+    <h3>🚨 Admin Alerts</h3>
+    <div class="alert warning">RFID Reader offline – Lab 2</div>
+    <div class="alert success">Attendance synced successfully</div>
+  </div>
+
+  <!-- LEAVE & LATE -->
+  <div class="statusGrid">
+    <div class="section">
+      <h3>📋 On Leave Today</h3>
+      <div class="statusItem leave"><strong>Priya Verma</strong> – Medical</div>
+      <div class="statusItem leave"><strong>Aditya Reddy</strong> – Casual</div>
+    </div>
+
+    <div class="section">
+      <h3>⏰ Late Arrivals</h3>
+      <div class="statusItem late"><strong>Vikram Singh</strong> – 45 min</div>
+      <div class="statusItem late"><strong>Neha Kapoor</strong> – 30 min</div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="section">
+    <h3>🕒 Recent Attendance Logs</h3>
+
+    <div class="searchBox">
+      <input type="text" id="searchInput" placeholder="🔍 Search by name">
+      <button onclick="clearSearch()">Clear</button>
+    </div>
+
+    <table id="attendanceTable">
+      <tr>
+        <th>Name</th><th>RFID</th><th>Time</th><th>Status</th>
+      </tr>
+      <tr><td>Rahul Sharma</td><td>RFID1023</td><td>09:02</td><td>Present</td></tr>
+      <tr><td>Ananya Patel</td><td>RFID1088</td><td>09:05</td><td>Present</td></tr>
+      <tr><td>Arjun Kumar</td><td>RFID1056</td><td>09:10</td><td>Absent</td></tr>
+    </table>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="section">
+    <h3>⚡ Admin Control Panel</h3>
+    <div class="actions">
+      <button>Register Student</button>
+      <button>Assign RFID</button>
+      <button>View Logs</button>
+      <button>Export Report</button>
+    </div>
+  </div>
+
+</div>
+
+<!-- JS -->
+<script src="../mini.js/dashboard.js"></script>
+
+</body>
+</html>
