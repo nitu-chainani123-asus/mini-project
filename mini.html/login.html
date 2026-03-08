@@ -15,13 +15,13 @@
             <h2 class="slide-element">Login</h2>
             <form action="#" onsubmit="handleLogin(event)">
                 <div class="field-wrapper slide-element">
-                    <input type="text" required>
-                    <label for="">Username</label>
-                    <i class="fa-solid fa-user"></i>
+                    <input type="email" id="loginEmail" required>
+                    <label for="">Email</label>
+                    <i class="fa-solid fa-envelope"></i>
                 </div>
 
                 <div class="field-wrapper slide-element">
-                    <input type="password" required>
+                    <input type="password" id="loginPassword" required>
                     <label for="">Password</label>
                     <i class="fa-solid fa-lock"></i>
                 </div>
@@ -53,25 +53,31 @@
             <h2 class="slide-element">Register</h2>
             <form action="#" onsubmit="handleRegister(event)">
                 <div class="field-wrapper slide-element">
-                    <input type="text" required>
-                    <label for="">Username</label>
+                    <input type="text" id="regName" required>
+                    <label for="">Full Name</label>
                     <i class="fa-solid fa-user"></i>
                 </div>
 
                 <div class="field-wrapper slide-element">
-                    <input type="email" required>
+                    <input type="email" id="regEmail" required>
                     <label for="">Email</label>
                     <i class="fa-solid fa-envelope"></i>
                 </div>
 
                 <div class="field-wrapper slide-element">
-                    <input type="tel" required>
+                    <input type="tel" id="regPhone" required>
                     <label for="">Phone Number</label>
                     <i class="fa-solid fa-phone"></i>
                 </div>
 
                 <div class="field-wrapper slide-element">
-                    <input type="password" required>
+                    <input type="text" id="regRFID" required>
+                    <label for="">RFID Card Number</label>
+                    <i class="fa-solid fa-id-card"></i>
+                </div>
+
+                <div class="field-wrapper slide-element">
+                    <input type="password" id="regPassword" required>
                     <label for="">Password</label>
                     <i class="fa-solid fa-lock"></i>
                 </div>
@@ -95,7 +101,51 @@
     <script>
     function handleLogin(event) {
       event.preventDefault();
-      window.location.href="minids2.html";
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      const user = users.find(u => u.email === email && u.password === password);
+      
+      if(user) {
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        localStorage.setItem('isLoggedIn', 'true');
+        window.location.href="userdashboard.html";
+      } else {
+        alert('Invalid email or password');
+      }
+    }
+    
+    function handleRegister(event) {
+      event.preventDefault();
+      const name = document.getElementById('regName').value;
+      const email = document.getElementById('regEmail').value;
+      const phone = document.getElementById('regPhone').value;
+      const rfidNumber = document.getElementById('regRFID').value;
+      const password = document.getElementById('regPassword').value;
+      
+      const users = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+      
+      if(users.find(u => u.email === email)) {
+        alert('Email already registered');
+        return;
+      }
+      
+      const newUser = {
+        name: name,
+        email: email,
+        phone: phone,
+        rfidNumber: rfidNumber,
+        password: password
+      };
+      
+      users.push(newUser);
+      localStorage.setItem('registeredUsers', JSON.stringify(users));
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      localStorage.setItem('isLoggedIn', 'true');
+      
+      alert('Registration successful! Welcome ' + name);
+      window.location.href="userdashboard.html";
     }
     
     function handleRegister(event) {

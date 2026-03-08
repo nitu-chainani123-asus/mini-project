@@ -1,28 +1,3 @@
-// Charts
-new Chart(document.getElementById('attendanceChart'), {
-  type: 'doughnut',
-  data: {
-    labels: ['Present','Absent'],
-    datasets: [{
-      data: [95,25],
-      backgroundColor: ['#22c55e','#ef4444']
-    }]
-  }
-});
-
-new Chart(document.getElementById('weeklyChart'), {
-  type: 'line',
-  data: {
-    labels: ['Mon','Tue','Wed','Thu','Fri'],
-    datasets: [{
-      label: 'Attendance %',
-      data: [85,90,88,92,95],
-      borderColor: '#38bdf8',
-      tension: 0.4
-    }]
-  }
-});
-
 // Search
 document.getElementById('searchInput').addEventListener('keyup', function(){
   const value = this.value.toLowerCase();

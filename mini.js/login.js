@@ -46,19 +46,26 @@ function updateThemeButton() {
 // Check "Remember Me" functionality
 document.addEventListener('DOMContentLoaded', function() {
     const rememberCheckbox = document.getElementById('rememberMe');
-    const usernameInput = document.querySelector('input[type="text"]:first-of-type');
+    const emailInput = document.getElementById('loginEmail');
     
-    const savedUsername = localStorage.getItem('rememberedUsername');
-    if (savedUsername) {
-        usernameInput.value = savedUsername;
+    const savedEmail = localStorage.getItem('rememberedEmail');
+    if (savedEmail) {
+        emailInput.value = savedEmail;
         rememberCheckbox.checked = true;
     }
 
     rememberCheckbox.addEventListener('change', function() {
         if (this.checked) {
-            localStorage.setItem('rememberedUsername', usernameInput.value);
+            localStorage.setItem('rememberedEmail', emailInput.value);
         } else {
-            localStorage.removeItem('rememberedUsername');
+            localStorage.removeItem('rememberedEmail');
+        }
+    });
+
+    // Update reminder when email input changes
+    emailInput.addEventListener('change', function() {
+        if (rememberCheckbox.checked) {
+            localStorage.setItem('rememberedEmail', this.value);
         }
     });
 });

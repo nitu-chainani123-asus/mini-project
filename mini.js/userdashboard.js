@@ -1,5 +1,8 @@
 let savedName = "";
+let savedEmail = "";
+let savedPhone = "";
 let savedRFID = "";
+let currentUser = null;
 let calMonth = null;
 let calYear = null;
 let calendarEvents = {};
@@ -39,6 +42,20 @@ function playClick(){
     o.stop(audioCtx.currentTime+0.1);
 }
 
+function updateFooterTime(){
+    const footerTimeEl = document.getElementById('footerTime');
+    if(footerTimeEl){
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString('en-US', { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit',
+            hour12: true
+        });
+        footerTimeEl.textContent = timeStr;
+    }
+}
+
 function initParticles(){
     const canvas = document.getElementById('meshCanvas');
     const renderer = new THREE.WebGLRenderer({canvas, alpha:true});
@@ -74,14 +91,42 @@ function initParticles(){
     animate();
 }
 
+function checkLoggedIn() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    return isLoggedIn === 'true';
+}
+
+function loadUserData() {
+    const userData = localStorage.getItem('currentUser');
+    if(!userData) {
+        return false;
+    }
+    
+    currentUser = JSON.parse(userData);
+    savedName = currentUser.name;
+    savedEmail = currentUser.email;
+    savedPhone = currentUser.phone;
+    savedRFID = currentUser.rfidNumber;
+    
+    return true;
+}
+
+function displayUserInfo() {
+    if(!currentUser) return;
+    
+    const box = document.getElementById('userInfoBox');
+    box.innerHTML = `
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div><strong>Name:</strong> ${savedName}</div>
+            <div><strong>Email:</strong> ${savedEmail}</div>
+            <div><strong>Phone:</strong> ${savedPhone}</div>
+            <div><strong>RFID Number:</strong> ${savedRFID}</div>
+        </div>
+    `;
+}
+
 function saveUser() {
-    const name = document.getElementById('username').value.trim();
-    const rfid = document.getElementById('rfid').value.trim();
-    if(!name || !rfid){ showAlert('Please fill all details.','error'); return; }
-    savedName = name;
-    savedRFID = rfid;
-    localStorage.setItem('savedName', savedName);
-    localStorage.setItem('savedRFID', savedRFID);
+    displayUserInfo();
     updateSummary();
     document.getElementById('headerSubtitle').textContent = `Welcome, ${savedName}!`;
     burstConfetti();
@@ -93,13 +138,9 @@ function saveUser() {
 }
 
 function loadFromStorage(){
-    const name = localStorage.getItem('savedName');
-    const rfid = localStorage.getItem('savedRFID');
-    if(name && rfid){
-        savedName = name;
-        savedRFID = rfid;
-        document.getElementById('username').value = name;
-        document.getElementById('rfid').value = rfid;
+    // Data is now loaded from login, not from stored name/rfid
+    if(currentUser) {
+        displayUserInfo();
         document.getElementById('headerSubtitle').textContent = `Welcome, ${savedName}!`;
         updateSummary();
     }
@@ -107,11 +148,13 @@ function loadFromStorage(){
 
 function resetDashboard(){
     savedName = '';
+    savedEmail = '';
+    savedPhone = '';
     savedRFID = '';
-    localStorage.removeItem('savedName');
-    localStorage.removeItem('savedRFID');
-    document.getElementById('username').value = '';
-    document.getElementById('rfid').value = '';
+    currentUser = null;
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('isLoggedIn');
+    document.getElementById('userInfoBox').innerHTML = 'Please log in to see your information.';
     document.getElementById('resultBox').innerHTML = 'Please submit your details to view attendance summary.';
     document.getElementById('headerSubtitle').textContent = 'Welcome back!';
     if(overviewChartObj){ overviewChartObj.destroy(); overviewChartObj=null; }
@@ -124,21 +167,6 @@ function toggleTheme(){
     document.body.classList.toggle('dark');
     localStorage.setItem('theme', document.body.classList.contains('dark') ? 'dark':'light');
     applyThemeToCharts();
-}
-
-function downloadReport(){
-    if(!savedName){ showAlert('Submit your details to generate a report.','error'); return; }
-    let csv = 'Date,Type,Value\n';
-    weeklyLabels.forEach((lab,i)=>{ csv += `${lab},weekly,${weeklyData[i]}\n`; });
-    monthlyLabels.forEach((lab,i)=>{ csv += `${lab},monthly,${monthlyData[i]}\n`; });
-    const blob = new Blob([csv],{type:'text/csv'});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `${savedName.replace(/\s+/g,'_')}_attendance.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-    showAlert('Report downloaded successfully','success');
 }
 
 function updateSummary(){
@@ -405,10 +433,13 @@ function navigateSection(sectionId) {
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+    // Load user data from login (if available)
+    loadUserData();
+
     // Initialize theme
     if(localStorage.getItem('theme') === 'dark') document.body.classList.add('dark');
 
-    // Load saved data
+    // Display user information if available
     loadFromStorage();
     loadCalendarEvents();
     loadNotes();
@@ -418,17 +449,12 @@ document.addEventListener('DOMContentLoaded',()=>{
     showCalendar(now.getMonth(), now.getFullYear());
     initCalendarControls();
 
-    // Form actions
-    document.getElementById('saveBtn').addEventListener('click', () => {
-        saveUser();
-    });
+    // Update footer time
+    updateFooterTime();
+    setInterval(updateFooterTime, 1000);
 
     document.getElementById('resetBtn').addEventListener('click', () => {
         resetDashboard();
-    });
-
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-        downloadReport();
     });
 
     document.getElementById('themeToggle').addEventListener('click', () => {

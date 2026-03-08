@@ -4,6 +4,30 @@ function toggleSidebar(){
 document.getElementById("sidebar").classList.toggle("active");
 }
 
+/* LOAD USER PROFILE */
+function loadUserProfile() {
+    try {
+        const userDataStr = localStorage.getItem('currentUser');
+        if (userDataStr) {
+            const user = JSON.parse(userDataStr);
+            const profileNameEl = document.getElementById('profileName');
+            const profileEmailEl = document.getElementById('profileEmail');
+            const profilePhoneEl = document.getElementById('profilePhone');
+            const profileRFIDEl = document.getElementById('profileRFID');
+            
+            if (profileNameEl) profileNameEl.textContent = user.name || 'User';
+            if (profileEmailEl) profileEmailEl.textContent = user.email || 'email@example.com';
+            if (profilePhoneEl) profilePhoneEl.textContent = user.phone || '---';
+            if (profileRFIDEl) profileRFIDEl.textContent = user.rfidNumber || '---';
+        }
+    } catch(e) {
+        console.log('Error loading user profile');
+    }
+}
+
+// Load profile when document is ready
+document.addEventListener('DOMContentLoaded', loadUserProfile);
+
 /* THEME */
 
 function toggleTheme(){
@@ -56,11 +80,12 @@ document.addEventListener('click', function(event) {
 
 function handleLogout() {
     if (confirm('Are you sure you want to logout?')) {
-        // Clear any stored session data
-        localStorage.clear();
+        // Clear login data
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('isLoggedIn');
         sessionStorage.clear();
         
-        // Redirect to login page or home page
+        // Redirect to login page
         window.location.href = 'login.html';
     }
 }
